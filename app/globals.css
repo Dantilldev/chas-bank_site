@@ -24,3 +24,17 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+button {
+  cursor: pointer;
+}
+
+Link {
+  cursor: pointer;
+}
+
+/* Understrykning vid hover för alla länkar */
+a:hover {
+  text-decoration: underline;
+  text-underline-position: under;
+}
