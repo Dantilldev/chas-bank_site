@@ -1,9 +1,48 @@
 "use client";
-import {useState} from "react";
 import useLogin from "@/context/LoginContext";
+import {useState, useEffect} from "react";
 
-export default function AuthPage() {
+export default function LoginPage() {
   const {isLogin, setIsLogin} = useLogin();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [users, setUsers] = useState([]);
+
+  // Get users
+  async function getUsers() {
+    const response = await fetch("http://localhost:4000/users", {
+      method: "GET",
+    });
+    const data = await response.json();
+    setUsers(data);
+  }
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  // Add users
+  async function addUsers(e) {
+    e.preventDefault();
+
+    const userExists = users.some((user) => user.email === email.toLowerCase());
+    if (userExists) {
+      alert("User already exists");
+      return;
+    }
+
+    const newUser = {email, password, id: crypto.randomUUID()};
+    await fetch("http://localhost:4000/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({newUser}),
+    });
+
+    setUsers([...users, newUser]);
+    setEmail("");
+    setPassword("");
+  }
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center bg-gray-100">
@@ -19,7 +58,7 @@ export default function AuthPage() {
           </p>
         </div>
 
-        <form>
+        <form onSubmit={addUsers}>
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -30,6 +69,8 @@ export default function AuthPage() {
             <input
               type="email"
               id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="your@email.com"
             />
@@ -45,13 +86,15 @@ export default function AuthPage() {
             <input
               type="password"
               id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="••••••••"
             />
           </div>
 
           <button
-            type="button"
+            type="submit"
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             {isLogin ? "Sign in" : "Sign up"}
