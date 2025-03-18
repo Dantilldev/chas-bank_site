@@ -21,23 +21,41 @@ function generateOTP() {
   return otp.toString();
 }
 
-// Användare
-
 // Din kod här. Skriv dina arrayer
 
-// 🟢 Lägg till användare (POST /users)
+// Users
+app.get("/users", (req, res) => {
+  res.json(users);
+});
 
 app.post("/users", (req, res) => {
   const user = req.body;
   users.push(user);
   res.json(user);
-  console.log(users);
+  console.log("Users: ", users);
 });
+
+// Account
+// app.get("/accounts", (req, res) => {
+//   res.json(accounts);
+// });
+let id = 0;
+
+app.post("/accounts", (req, res) => {
+  const account = req.body;
+  const newAccount = {id: id++, ...account};
+  accounts.push(newAccount);
+  res.json(newAccount);
+  console.log("Account: ", accounts);
+});
+
+// accounts.push({id, userID: user.id, amount: 0});
 // Din kod här. Skriv dina routes:
 
 // Starta servern
 app.listen(port, () => {
-  console.log(`Bankens backend körs på http://localhost:${port}`);
+  console.log(`Bankens backend körs på http://localhost:${port}
+    `);
 });
 
 // Använd denna när du vill randera ut alla användare

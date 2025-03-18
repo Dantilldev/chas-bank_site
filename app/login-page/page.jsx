@@ -30,18 +30,44 @@ export default function LoginPage() {
       return;
     }
 
-    const newUser = {email, password, id: crypto.randomUUID()};
+    const newUser = {email, password, id: Date.now()};
+    const newAccount = {userID: newUser.id, amount: 0};
+
     await fetch("http://localhost:4000/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({newUser}),
+      body: JSON.stringify(newUser),
+    });
+
+    await fetch("http://localhost:4000/accounts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newAccount),
     });
 
     setUsers([...users, newUser]);
     setEmail("");
     setPassword("");
+    alert("User added successfully");
+  }
+
+  async function handleSignIn(e) {
+    e.preventDefault();
+
+    const user = users.find(
+      (user) => user.email === email.toLowerCase() && user.password === password
+    );
+
+    if (user) {
+      alert("Login sucessful!");
+      setIsLogin(true);
+    } else {
+      alert("Invalid username or password. Please try again.");
+    }
   }
 
   return (
@@ -58,7 +84,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form onSubmit={addUsers}>
+        <form onSubmit={isLogin ? handleSignIn : addUsers}>
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -73,6 +99,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="your@email.com"
+              required
             />
           </div>
 
@@ -88,14 +115,14 @@ export default function LoginPage() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md  "
               placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md"
           >
             {isLogin ? "Sign in" : "Sign up"}
           </button>
@@ -103,7 +130,7 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
+            {isLogin ? "Register -->" : "Already have an account?"}
             <button
               className="font-medium text-blue-600 hover:text-blue-500"
               onClick={() => setIsLogin(!isLogin)}
